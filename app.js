@@ -2,12 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 
+const authController = require('./controller/auth-controller');
+
 const notfoundMDW = require('./middlewares/not-found');
 const errorMDW = require('./middlewares/error');
 
 app.use(express.json());
 
-app.post('/register');
+app.post('/register',authController.register);
 
 app.use(notfoundMDW);
 app.use(errorMDW);
