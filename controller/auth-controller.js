@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { registerSchema } = require("../validate/auth-validator");
+const bcrypt = require('bcryptjs');
 
 exports.register = async (req, res, next) => {
   try {
@@ -11,11 +12,12 @@ exports.register = async (req, res, next) => {
     // console.log(value);
 
     const prisma = new PrismaClient();
+    value.password = await bcrypt.hash(value.password,12) //hash password
     const user = await prisma.user.create({
       data: value,
     });
 
-    res.status(201).json({ message: "register success",user });
+    res.status(201).json({ message: "register success" ,user});
   } catch (error) {
     next(error);
   }

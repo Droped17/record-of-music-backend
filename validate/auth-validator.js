@@ -5,8 +5,9 @@ const registerSchema = Joi.object({
     lastName: Joi.string().trim().required(),
     email : Joi.string().email().required(),
     password: Joi.string().trim().pattern(/^[a-zA-Z0-9]{6,30}$/).required(),
-    confirmPassword: Joi.string().valid(Joi.ref("password")).trim().required(),
+    confirmPassword: Joi.string().valid(Joi.ref("password")).trim().strip().required(),
     mobile: Joi.string().trim().required(),
+    profileImage: '',
 })
 
 exports.registerSchema = registerSchema;
