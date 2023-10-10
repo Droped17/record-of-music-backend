@@ -10,6 +10,8 @@ const errorMDW = require('./middlewares/error');
 app.use(express.json());
 
 app.post('/register',authController.register);
+app.post('/login',authController.login);
+
 
 app.use(notfoundMDW);
 app.use(errorMDW);
