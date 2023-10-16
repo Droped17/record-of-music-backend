@@ -18,5 +18,8 @@ model User {
   password     String
   mobile       String  @unique
   profileImage String?
+  isAdmin      String?
+  addressId    String
 }
+
 
