@@ -14,23 +14,23 @@ exports.register = async (req, res, next) => {
       next(error);
     }
 
-    // const prisma = new PrismaClient();
-    // value.password = await bcrypt.hash(value.password, 12); //hash password
-    // const user = await prisma.user.create({
-    //   data: value,
-    // });
+    const prisma = new PrismaClient();
+    value.password = await bcrypt.hash(value.password, 12); //hash password
+    const user = await prisma.user.create({
+      data: value,
+    });
 
-    const payload = { userId: user.id };
-    const accessToken = jwt.sign(
-      payload,
-      process.env.JWT_SECRET_KEY || qwerty17xsdfg22,
-      {
-        expiresIn: process.env.JWT_EXPIRE_DATE
-      }
-    );
+    // const payload = { userId: user.id };
+    // const accessToken = jwt.sign(
+    //   payload,
+    //   process.env.JWT_SECRET_KEY || qwerty17xsdfg22,
+    //   {
+    //     expiresIn: process.env.JWT_EXPIRE_DATE
+    //   }
+    // );
 
-    console.log(accessToken);
-    res.status(201).json({ message: "register success" });
+    // console.log(accessToken);
+    res.status(201).json({ message: "register success", user });
   } catch (error) {
     next(error);
   }

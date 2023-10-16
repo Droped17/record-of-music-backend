@@ -19,7 +19,71 @@ model User {
   mobile       String  @unique
   profileImage String?
   isAdmin      String?
-  addressId    String
+  addressId    String?
+  order        Order[]
 }
 
+model Address {
+  id          Int    @id @default(autoincrement())
+  province    String
+  district    String
+  subdistrict String
+  zipcode     String
+}
 
+model Order {
+  id            Int           @id @default(autoincrement())
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id])
+  createAt      DateTime      @default(now())
+  totalCost     Int
+  recId         Int
+  paymentStatus String
+  recordOrder   RecordOrder[]
+}
+
+model RecordOrder {
+  id      Int      @id @default(autoincrement())
+  userId  Int
+  amount  Int
+  date    DateTime @default(now())
+  recId   Int
+  rec     Record   @relation(fields: [recId], references: [id])
+  orderId Int
+  order   Order    @relation(fields: [orderId], references: [id])
+}
+
+model Record {
+  id          Int           @id @default(autoincrement())
+  albumName   String
+  genreName   String
+  price       Int
+  artistId    Int
+  image       String
+  recordInfo  String
+  score       Int
+  RecordOrder RecordOrder[]
+  Track       Track[]
+  Genre       Genre[]
+}
+
+model Genre {
+  id        Int    @id @default(autoincrement())
+  genreName String
+  recId     Int
+  rec       Record @relation(fields: [recId], references: [id])
+}
+
+model Track {
+  id        Int    @id @default(autoincrement())
+  trackName String
+  recId     Int
+  rec       Record @relation(fields: [recId], references: [id])
+}
+
+model Artist {
+  id         Int    @id @default(autoincrement())
+  artistName String
+  albumId    Int
+  genreId    Int
+}

@@ -8,6 +8,8 @@ const registerSchema = Joi.object({
     confirmPassword: Joi.string().valid(Joi.ref("password")).trim().strip().required(), //strip() คือการตัดออก ไม่ให้ value เอาไปใช้งาน
     mobile: Joi.string().trim().required(),
     profileImage: '',
+    isAdmin: '',
+    addressId: ''
 })
 
 exports.registerSchema = registerSchema;
