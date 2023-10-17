@@ -13,7 +13,7 @@ model User {
 }
 
 REGISTER
-post /register
+post /authen/register
 body : {firstName,lastName,email,password,mobile,profileImage?}
 res: 
 200 {message: string}
@@ -21,8 +21,15 @@ res:
 500 {message: string}
 
 LOGIN
-post /login
+post /authen/login
 body: {email,password}
+res: 
+200 {message: string}
+400 {message: string}
+500 {message: string}
+
+GET PRODUCT
+get /authen/product
 res: 
 200 {message: string}
 400 {message: string}

@@ -8,6 +8,7 @@ const notfoundMDW = require('./middlewares/not-found');
 const errorMDW = require('./middlewares/error');
 
 app.use(express.json());
+app.use(express.static('public'));
 app.use(cors());
 
 
