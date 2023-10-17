@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const { registerSchema, loginSchema } = require("../validate/auth-validator");
 const { customError } = require("../utility/custom-error");
@@ -20,17 +21,18 @@ exports.register = async (req, res, next) => {
       data: value,
     });
 
-    // const payload = { userId: user.id };
-    // const accessToken = jwt.sign(
-    //   payload,
-    //   process.env.JWT_SECRET_KEY || qwerty17xsdfg22,
-    //   {
-    //     expiresIn: process.env.JWT_EXPIRE_DATE
-    //   }
-    // );
+    const payload = { userId: user.id };
+    const accessToken = jwt.sign(
+      payload,
+      process.env.JWT_SECRET_KEY || qwerty17xsdfg22,
+      {
+        expiresIn: process.env.JWT_EXPIRE_DATE,
+      }
+    );
+    console.log(payload);
+    console.log(accessToken);
 
-    // console.log(accessToken);
-    res.status(201).json({ message: "register success", user });
+    res.status(201).json({ message: "register success", user, accessToken });
   } catch (error) {
     next(error);
   }
@@ -64,8 +66,23 @@ exports.login = async (req, res, next) => {
       return next(customError("invalid login", 400));
     }
 
-    res.status(200).json({ message: "login success", user });
+    const payload = { userId: user.id };
+    const accessToken = jwt.sign(
+      payload,
+      process.env.JWT_SECRET_KEY || qwerty17xsdfg22,
+      {
+        expiresIn: process.env.JWT_EXPIRE_DATE,
+      }
+    );
+    console.log(payload);
+    console.log(accessToken);
+
+    res.status(200).json({ message: "login success", user, accessToken });
   } catch (error) {
     next(error);
   }
+};
+
+exports.getMe = (req, res, next) => {
+  res.status(200).json({ user: req.user });
 };

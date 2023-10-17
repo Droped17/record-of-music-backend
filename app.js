@@ -1,9 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const app = express();
-const authController = require('./controller/auth-controller');
 
+const app = express();
+const authenRoute = require('./routes/authen-route');
 const notfoundMDW = require('./middlewares/not-found');
 const errorMDW = require('./middlewares/error');
 
@@ -11,9 +11,7 @@ app.use(express.json());
 app.use(cors());
 
 
-app.post('/register',authController.register);
-app.post('/login',authController.login);
-
+app.use('/authen', authenRoute);
 
 app.use(notfoundMDW);
 app.use(errorMDW);
