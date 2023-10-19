@@ -1,5 +1,3 @@
-const Multer = require("multer");
-
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -9,16 +7,4 @@ cloudinary.config({
     secure: true //encrypt data
 });
 
-const handleUpload = async() => {
-    const res = await cloudinary.uploader.upload(file,{
-        resource_type: "auto",
-    })
-    return res;
-};
-
-const storage = new Multer.memoryStorage();
-const upload = Multer({
-    storage,
-});
-
-exports.upload = upload;
+module.exports = cloudinary;
