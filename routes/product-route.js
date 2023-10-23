@@ -14,6 +14,7 @@ router.get("/", async (req, res, next) => {
       price: true,
       recordInfo: true,
       image: true,
+      artistName: true
     },
   });
 
@@ -37,15 +38,16 @@ router.get("/:id", async (req, res, next) => {
 // Create Product
 router.post("/", uploadMiddleware.single("image"), async (req, res, next) => {
   try {
-    const { albumName, genreName, price, file, recordInfo, score, artistId } =
+    const { albumName, genreName, price, file, recordInfo, score, artistName } =
       req.body;
+
 
     const data = {
       image: file,
       albumName: albumName,
       genreName: genreName,
       price: Number(price),
-      artistId: Number(artistId),
+      artistName: artistName,
       recordInfo: recordInfo,
       score: Number(score),
     };
@@ -66,7 +68,7 @@ router.post("/", uploadMiddleware.single("image"), async (req, res, next) => {
 
     console.log(newProduct);
 
-    res.status(200).json({ msg: "add product success" });
+    res.status(200).json({ msg: "add product success",data });
   } catch (error) {
     next(error);
   } finally {
@@ -79,7 +81,7 @@ router.post("/", uploadMiddleware.single("image"), async (req, res, next) => {
 router.patch("/:id",uploadMiddleware.single("image"),  async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { albumName, genreName, price, file, recordInfo, score, artistId } =
+    const { albumName, genreName, price, file, recordInfo, score, artistName } =
       req.body;
 
     const data = {
@@ -87,7 +89,7 @@ router.patch("/:id",uploadMiddleware.single("image"),  async (req, res, next) =>
       albumName: albumName,
       genreName: genreName,
       price: Number(price),
-      artistId: Number(artistId),
+      artistName: artistName,
       recordInfo: recordInfo,
       score: Number(score),
     };
