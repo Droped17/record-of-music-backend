@@ -28,7 +28,7 @@ module.exports = async (req, res, next) => {
       error.name === "TokenExpiredError" ||
       error.name === "JsonWebTokenError"
     ) {
-      error.statusCode = 401;
+      error.statusCode = 401; 
     }
     next(error);
   }
