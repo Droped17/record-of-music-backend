@@ -41,6 +41,7 @@ router.post("/", uploadMiddleware.single("image"), async (req, res, next) => {
     const { albumName, genreName, price, file, recordInfo, score, artistName } =
       req.body;
 
+      console.log(file);
 
     const data = {
       image: file,

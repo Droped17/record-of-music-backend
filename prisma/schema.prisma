@@ -46,14 +46,15 @@ model Order {
 }
 
 model RecordOrder {
-  id      Int      @id @default(autoincrement())
-  userId  Int
-  amount  Int
-  date    DateTime @default(now())
-  recId   Int
-  rec     Record   @relation(fields: [recId], references: [id])
-  orderId Int
-  order   Order    @relation(fields: [orderId], references: [id])
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Int
+  date      DateTime @default(now())
+  recId     Int
+  rec       Record   @relation(fields: [recId], references: [id])
+  orderId   Int
+  slipImage String
+  order     Order    @relation(fields: [orderId], references: [id])
 }
 
 model Record {
@@ -75,4 +76,3 @@ model Genre {
   recId     Int
   rec       Record @relation(fields: [recId], references: [id])
 }
-
