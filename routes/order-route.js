@@ -5,70 +5,137 @@ const { upload } = require("../utility/cloudinary-service");
 const fs = require("fs/promises");
 const uploadMiddleware = require("../middlewares/upload");
 
-router.post("/", async (req, res, next) => {
+router.get("/cart/:orderId", async (req, res, next) => {
   try {
-    console.log(req.body);
-
-    const { userId, amount, date } = req.body;
-
-    console.log(userId);
-    console.log(date);
-
-    for (const element of amount) {
-      console.log(element);
-
-      const createOrder = await prisma.order.create({
-        data: {
-          userId: userId,
-          createAt: date,
-          totalCost: element.quantity,
-          recId: element.id,
-          paymentStatus: "pending",
-        },
-      });
-
-      return createOrder;
-    }
-
-    res.status(200).json({ msg: "success", createOrder });
+    const { orderId } = req.params;
+    const result = await prisma.order.findMany({
+      where: {
+        userId: Number(orderId),
+      },
+      include: {
+        rec: true,
+      },
+    });
+    res.status(200).json({ msg: "success", result });
   } catch (error) {
     next(error);
   }
 });
 
-router.post(
-  "/createPayment",
+router.post("/", async (req, res, next) => {
+  try {
+    const { userId, amount, recId, price } = req.body;
+
+    const data = {
+      userId: userId,
+      amount: amount,
+      recId: recId,
+      totalCost: price,
+    };
+
+    console.log(`ID===:`, data);
+
+    // Create the recordOrder with the related Record
+    const result = await prisma.order.create({
+      data: data,
+    });
+
+    res.status(200).json({ msg: "success" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/createPayment", async (req, res, next) => {
+  try {
+    const results = req.body.map(async (el) => {
+      const { userId, totalCost, recId } = el;
+
+      const createdRecordOrderPending = await prisma.recordOrderPending.create({
+        data: {
+          userId: userId,
+          price: totalCost,
+          orderId: recId,
+        },
+      });
+    });
+
+    res.status(200).json({ msg: "success", results });
+  } catch (error) {
+    console.error("Error processing payments:", error);
+    next(error);
+  }
+});
+
+router.get("/payment/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await prisma.recordOrderPending.findMany({
+      where: {
+        userId: Number(id),
+      },
+      include: {
+        order: {
+          include: {
+            rec: true,
+          },
+        },
+        user: true,
+      },
+    });
+
+    res.status(200).json({ msg: "success", result });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/all-payment", async (req, res, next) => {
+  try {
+    const result = await prisma.recordOrderPending.findMany({
+      include: {
+        order: {
+          include: {
+            rec: true,
+          },
+        },
+        user: true,
+      },
+    });
+    console.log(result);
+
+    res.status(200).json({ msg: "get all-payment success", result });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+router.patch(
+  "/uploadImage",
   uploadMiddleware.single("image"),
   async (req, res, next) => {
+    const { file, userId } = req.body;
+
+    console.log(`UserID====>`,userId)
+    const data = {
+      slipImage: file
+    }
+
+    if (!req.file) {
+      console.log("err");
+    }
+
+    if (req.file) {
+      data.slipImage = await upload(req.file.path);
+    }
     try {
-      const { file, currentDate } = req.body;
-      
-      const data = {
-        userId: 1,
-        amount: 1,
-        date: currentDate,
-        recId: 1,
-        orderId: 2,
-        slipImage:"image.jpg",
-      };
-
-      if (!req.file) {
-        console.log("err");
-      }
-
-      if (req.file) {
-        data.slipImage = await upload(req.file.path);
-      }
-
-      console.log(`data: ${data}`);
-
-      const slip = await prisma.recordOrder.create({
-        data: data,
+      const result = await prisma.recordOrderPending.updateMany({
+        where: {
+          userId: Number(userId),
+        },
+        data: data
       });
-
-      console.log(slip);
-
-      res.status(200).json({ msg: "create success" });
+      res.status(200).json({msg:"success",result});
     } catch (error) {
       next(error);
     } finally {
@@ -79,25 +146,5 @@ router.post(
   }
 );
 
-router.post("/bill", async (req, res, next) => {
-  try {
-    const { userId } = req.body;
-    console.log(userId);
-    const ordersWithRecordOrders = await prisma.order.findMany({
-      where: {
-        userId: userId,
-      },
-      include: {
-        recordOrder: true,
-      },
-    });
-
-    // console.log("Orders with associated RecordOrders:", ordersWithRecordOrders);
-    // res.status(200).json({msg: "success",ordersWithRecordOrders});
-    res.status(200).json({ msg: "success", ordersWithRecordOrders });
-  } catch (error) {
-    next(error);
-  }
-});
 
 module.exports = router;

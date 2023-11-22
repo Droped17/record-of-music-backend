@@ -14,7 +14,7 @@ router.get("/", async (req, res, next) => {
       price: true,
       recordInfo: true,
       image: true,
-      artistName: true
+      artistName: true,
     },
   });
 
@@ -30,7 +30,7 @@ router.get("/:id", async (req, res, next) => {
       id: Number(id),
     },
   });
-  console.log(product);
+  // console.log(product);
 
   res.status(201).json({ msg: "get item success", product });
 });
@@ -38,15 +38,15 @@ router.get("/:id", async (req, res, next) => {
 // Create Product
 router.post("/", uploadMiddleware.single("image"), async (req, res, next) => {
   try {
-    const { albumName, genreName, price, file, recordInfo, score, artistName } =
+    const { albumName, genreType, price, file, recordInfo, score, artistName } =
       req.body;
 
-      console.log(file);
+    // console.log(genreType);
 
     const data = {
       image: file,
       albumName: albumName,
-      genreName: genreName,
+      genreType: genreType || "1",
       price: Number(price),
       artistName: artistName,
       recordInfo: recordInfo,
@@ -61,15 +61,15 @@ router.post("/", uploadMiddleware.single("image"), async (req, res, next) => {
       data.image = await upload(req.file.path);
     }
 
-    console.log(`data: ${data}`);
+    // console.log(`data: ${data}`);
 
     const newProduct = await prisma.record.create({
       data: data,
     });
 
-    console.log(newProduct);
+    // console.log(newProduct);
 
-    res.status(200).json({ msg: "add product success",data });
+    res.status(200).json({ msg: "add product success", data });
   } catch (error) {
     next(error);
   } finally {
@@ -79,43 +79,54 @@ router.post("/", uploadMiddleware.single("image"), async (req, res, next) => {
   }
 });
 
-router.patch("/:id",uploadMiddleware.single("image"),  async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { albumName, genreName, price, file, recordInfo, score, artistName } =
-      req.body;
+router.patch(
+  "/:id",
+  uploadMiddleware.single("image"),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const {
+        albumName,
+        genreName,
+        price,
+        file,
+        recordInfo,
+        score,
+        artistName,
+      } = req.body;
 
-    const data = {
-      image: file,
-      albumName: albumName,
-      genreName: genreName,
-      price: Number(price),
-      artistName: artistName,
-      recordInfo: recordInfo,
-      score: Number(score),
-    };
+      const data = {
+        image: file,
+        albumName: albumName,
+        genreName: genreName,
+        price: Number(price),
+        artistName: artistName,
+        recordInfo: recordInfo,
+        score: Number(score),
+      };
 
-    if (!req.file) {
-      console.log("err");
+      if (!req.file) {
+        console.log("err");
+      }
+
+      if (req.file) {
+        data.image = await upload(req.file.path);
+      }
+
+      console.log(`data: ${data}`);
+      const result = await prisma.record.update({
+        where: {
+          id: Number(id),
+        },
+        data: data,
+      });
+      console.log(result);
+      res.status(200).json({ msg: "update successfully", result });
+    } catch (error) {
+      next(error);
     }
-
-    if (req.file) {
-      data.image = await upload(req.file.path);
-    }
-
-    console.log(`data: ${data}`);
-    const result = await prisma.record.update({
-      where: {
-        id: Number(id),
-      },
-      data: data,
-    });
-    console.log(result);
-    res.status(200).json({ msg: "update successfully", result });
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 // delete product
 router.delete("/:id", async (req, res, next) => {

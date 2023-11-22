@@ -11,17 +11,18 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  firstName    String
-  lastName     String
-  email        String    @unique
-  password     String
-  mobile       String    @unique
-  profileImage String?
-  isAdmin      String?
-  addressId    String?
-  order        Order[]
-  Address      Address[]
+  id                 Int                  @id @default(autoincrement())
+  firstName          String
+  lastName           String
+  email              String               @unique
+  password           String
+  mobile             String               @unique
+  profileImage       String?
+  isAdmin            String?
+  addressId          String?
+  order              Order[]
+  Address            Address[]
+  RecordOrderPending RecordOrderPending[]
 }
 
 model Address {
@@ -35,39 +36,52 @@ model Address {
 }
 
 model Order {
-  id            Int           @id @default(autoincrement())
-  userId        Int
-  user          User          @relation(fields: [userId], references: [id])
-  createAt      DateTime      @default(now())
-  totalCost     Int
-  recId         Int
-  paymentStatus String
-  recordOrder   RecordOrder[]
+  id                 Int                  @id @default(autoincrement())
+  userId             Int
+  user               User                 @relation(fields: [userId], references: [id])
+  createAt           DateTime             @default(now())
+  totalCost          Int
+  amount             Int
+  recId              Int
+  rec                Record               @relation(fields: [recId], references: [id])
+  recordOrder        RecordOrder[]
+  RecordOrderPending RecordOrderPending[]
 }
 
 model RecordOrder {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  amount    Int
-  date      DateTime @default(now())
-  recId     Int
-  rec       Record   @relation(fields: [recId], references: [id])
-  orderId   Int
-  slipImage String
-  order     Order    @relation(fields: [orderId], references: [id])
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  date          DateTime @default(now())
+  price         Int
+  paymentStatus Int      @default(0)
+  orderId       Int
+  slipImage     String?
+  order         Order    @relation(fields: [orderId], references: [id])
+}
+
+model RecordOrderPending {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  date          DateTime @default(now())
+  price         Int
+  paymentStatus Int      @default(0)
+  orderId       Int
+  slipImage     String?
+  order         Order    @relation(fields: [orderId], references: [id])
 }
 
 model Record {
-  id          Int           @id @default(autoincrement())
-  albumName   String
-  genreName   String
-  price       Int
-  artistName  String
-  image       String
-  recordInfo  String
-  score       Int
-  RecordOrder RecordOrder[]
-  Genre       Genre[]
+  id         Int     @id @default(autoincrement())
+  albumName  String
+  genreType  String
+  price      Int
+  artistName String
+  image      String
+  recordInfo String
+  score      Int
+  Genre      Genre[]
+  Order      Order[]
 }
 
 model Genre {
